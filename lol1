@@ -1,0 +1,50 @@
+import random
+import numpy as np
+import math
+
+#given function f:
+def f(x: float, y:float):
+    return (x - math.pi)**2 + (y - math.e)**2 + math.sin(3*x + 0.75) + math.cos(4*y - 2.13)
+
+#creating an array of initial positions of the particles:
+def create_arr(particles_num):
+    #basically sampling float numbers from 0 to 5 with precision to 3 digits after the coma:
+    list1 = random.sample(range(0, 5000), particles_num)
+    list2 = random.sample(range(0, 5000), particles_num)
+    X = np.array([list1, list2])
+    X = X/1000
+    return np.transpose(X)
+
+#finding global minimum:
+def find_gbest(pbest, N):
+    res = 0
+    for i in range(1, N):
+        if f(pbest[i][0], pbest[i][1]) < f(pbest[res][0], pbest[res][1]):
+            res = i
+    return pbest[res]
+
+#initializing constants and variables
+c1 = 0.5
+c2 = 0.5
+w = 0.5
+t = 50
+N = 20
+X = create_arr(N)
+pbest = X
+V = create_arr(N)
+
+for i in range(t):
+    r1 = random.randint(0, 1)
+    r2 = random.randint(0, 1)
+
+    #updating the minimum of each particle
+    for j in range(N):
+        if(f(X[j][0], X[j][1]) < f(pbest[j][0], pbest[j][1])):
+            pbest[j] = X[j]
+
+    gbest = find_gbest(pbest, N)
+
+    V = w*V + c1*r1*(pbest - X) + c2*r2*(gbest - X)
+    X = X + V
+
+print(math.e, gbest)
